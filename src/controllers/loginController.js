@@ -9,7 +9,7 @@ const login = async (req, res) => {
         return res.status(400).json({ message });
     }
 
-    const token = tokenGenerator(req.body.email);
+    const token = tokenGenerator(email);
 
     return res.status(200).json({ token });
 };
