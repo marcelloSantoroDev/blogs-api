@@ -1,7 +1,7 @@
 // const { User } = require('../models');
 const { validateLoginEmail, existingUserCheck } = require('./validations/validationInputValues');
 
-const createUser = async ({ email, password }) => {
+const login = async ({ email, password }) => {
     if (!email || !password) {
         return { type: 'INVALID_FIELDS', message: 'Some required fields are missing' };
     }
@@ -22,5 +22,5 @@ const createUser = async ({ email, password }) => {
 };
 
 module.exports = {
-    createUser,
+    login,
 };
