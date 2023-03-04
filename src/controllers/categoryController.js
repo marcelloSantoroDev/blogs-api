@@ -5,10 +5,10 @@ const createCategory = async (req, res) => {
     const { type, message } = await categoryService.createCategory({ name });
 
     if (type) {
-        return res.status(404).json({ message });
+        return res.status(400).json({ message });
     }
 
-    return res.status(200).json(message);
+    return res.status(201).json(message);
 };
 
 module.exports = {
