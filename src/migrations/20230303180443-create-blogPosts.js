@@ -17,8 +17,9 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false
       },
-      user_id: {
+      userId: {
         type: Sequelize.INTEGER,
+        field: 'user_id',
         references: {
           model: 'users',
           key: 'id'

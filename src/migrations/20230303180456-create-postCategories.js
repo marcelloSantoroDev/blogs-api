@@ -3,9 +3,10 @@
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     await queryInterface.createTable('posts_categories', {
-      post_id: {
+      postId: {
         type: Sequelize.INTEGER,
         primaryKey: true,
+        field: 'post_id',
         references: {
           model: 'blog_posts',
           key: 'id'
@@ -13,8 +14,9 @@ module.exports = {
         onDelete: 'CASCADE',
         onUpdate: 'CASCADE',
       },
-      category_id: {
+      categoryId: {
         type: Sequelize.INTEGER,
+        field: 'category_id',
         primaryKey: true,
         references: {
           model: 'categories',
