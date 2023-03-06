@@ -8,5 +8,6 @@ const tokenValidator = require('../middlewares/tokenValidator');
 router.post('/', tokenValidator, blogPostController.createblogPost);
 router.get('/', tokenValidator, blogPostController.getAll);
 router.get('/:id', tokenValidator, blogPostController.getById);
+router.put('/:id', tokenValidator, blogPostController.updateBlogPost);
 
 module.exports = router;

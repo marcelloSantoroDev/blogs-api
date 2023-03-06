@@ -30,8 +30,22 @@ const getById = async (req, res) => {
     return res.status(200).json(message);
 };
 
+const updateBlogPost = async (req, res) => {
+    const userId = req.user.id;
+    const blogPostId = req.params.id;
+    const { title, content } = req.body;
+    const { type, message } = await blogPostService
+    .updateBlogPost({ title, content, userId, blogPostId });
+
+    if (type === 'UNAUTHORIZED_USER') return res.status(401).json({ message });
+    if (type === 'INVALID_VALUES') return res.status(400).json({ message });
+
+    return res.status(200).json(message);
+};
+
 module.exports = {
     getAll,
     createblogPost,
     getById,
+    updateBlogPost,
 };

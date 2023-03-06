@@ -1,5 +1,5 @@
 const { emailSchema } = require('./schemas');
-const { User, Category } = require('../../models');
+const { User, Category, BlogPost } = require('../../models');
 
 const validateLoginEmail = (email) => {
     const { error } = emailSchema.validate(email);
@@ -41,8 +41,23 @@ const validateBlogPost = async ({ title, content, categoryIds }) => {
     return { type: null, message: '' };
 };
 
+const validateBlogPostUpdate = async ({ title, content, userId, blogPostId }) => {
+    if (!title || !content) {
+        return { type: 'INVALID_VALUES', message: 'Some required fields are missing' };
+    }
+
+    const postToUpdate = await BlogPost.findOne({ where: { id: blogPostId } });
+    const isThisUserAuthorized = postToUpdate.dataValues.userId === userId;
+    if (!isThisUserAuthorized) {
+        return { type: 'UNAUTHORIZED_USER', message: 'Unauthorized user' };
+    }
+
+    return { type: null, message: '' };
+};
+
 module.exports = {
     validateLoginEmail,
     existingUserCheck,
     validateBlogPost,
+    validateBlogPostUpdate,
 };
