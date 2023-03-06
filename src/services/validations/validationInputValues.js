@@ -55,9 +55,24 @@ const validateBlogPostUpdate = async ({ title, content, userId, blogPostId }) =>
     return { type: null, message: '' };
 };
 
+const validateBlogPostDeletion = async ({ userId, blogPostId }) => {
+    const postToDelete = await BlogPost.findOne({ where: { id: blogPostId } });
+    if (!postToDelete) {
+        return { type: 'POST_NOT_FOUND', message: 'Post does not exist' };
+    }
+
+    const isThisUserAuthorized = postToDelete.dataValues.userId === userId;
+    if (!isThisUserAuthorized) {
+        return { type: 'UNAUTHORIZED_USER', message: 'Unauthorized user' };
+    }
+
+    return { type: null, message: '' };
+};
+
 module.exports = {
     validateLoginEmail,
     existingUserCheck,
     validateBlogPost,
     validateBlogPostUpdate,
+    validateBlogPostDeletion,
 };

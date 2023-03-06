@@ -1,5 +1,9 @@
 const { User, BlogPost, Category, PostCategory, sequelize } = require('../models');
-const { validateBlogPost, validateBlogPostUpdate } = require('./validations/validationInputValues');
+const {
+    validateBlogPost,
+    validateBlogPostUpdate,
+    validateBlogPostDeletion,
+} = require('./validations/validationInputValues');
 
 const getAll = async () => {
     const blogPosts = await BlogPost.findAll({
@@ -64,9 +68,22 @@ const createblogPost = async ({ title, content, categoryIds, id }) => {
         return { type: null, message: updatedBlogPost };
     };
 
+    const deleteBlogPost = async ({ userId, blogPostId }) => {
+        const error = await validateBlogPostDeletion({ userId, blogPostId });
+
+        if (error.type) {
+            return error;
+        }
+
+        await BlogPost.destroy({ where: { id: blogPostId } });
+
+        return { type: null, message: '' };
+    };
+
 module.exports = {
     getAll,
     createblogPost,
     getById,
     updateBlogPost,
+    deleteBlogPost,
 };

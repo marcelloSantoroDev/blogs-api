@@ -43,9 +43,21 @@ const updateBlogPost = async (req, res) => {
     return res.status(200).json(message);
 };
 
+const deleteBlogPost = async (req, res) => {
+    const userId = req.user.id;
+    const blogPostId = req.params.id;
+    const { type, message } = await blogPostService.deleteBlogPost({ userId, blogPostId });
+
+    if (type === 'UNAUTHORIZED_USER') return res.status(401).json({ message });
+    if (type === 'POST_NOT_FOUND') return res.status(404).json({ message });
+
+    return res.status(204).end();
+};
+
 module.exports = {
     getAll,
     createblogPost,
     getById,
     updateBlogPost,
+    deleteBlogPost,
 };
