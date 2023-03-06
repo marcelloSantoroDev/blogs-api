@@ -1,3 +1,5 @@
+/* eslint-disable max-lines-per-function */
+const { Op } = require('sequelize');
 const { User, BlogPost, Category, PostCategory, sequelize } = require('../models');
 const {
     validateBlogPost,
@@ -80,10 +82,40 @@ const createblogPost = async ({ title, content, categoryIds, id }) => {
         return { type: null, message: '' };
     };
 
+    const search = async (q) => {
+        if (!q) {
+            const a = await getAll();
+            return { type: null, message: a.message };
+        }
+
+        const blogPostByTitle = await BlogPost
+        .findAll({ where: { title: { [Op.like]: `%${q}%` } },
+        include: [
+            { model: User, as: 'user', attributes: { exclude: 'password' } }, 
+            { model: Category, as: 'categories' }] });
+
+        const blogPostByContent = await BlogPost
+        .findAll({ where: { content: { [Op.like]: `%${q}%` } },
+        include: [
+            { model: User, as: 'user', attributes: { exclude: 'password' } }, 
+            { model: Category, as: 'categories' }] });
+
+        if (blogPostByTitle.length > 0) {
+            return { type: null, message: blogPostByTitle };
+        }
+
+        if (blogPostByContent.length > 0) {
+            return { type: null, message: blogPostByContent };
+        }
+
+        return { type: null, message: [] };
+    };
+
 module.exports = {
     getAll,
     createblogPost,
     getById,
     updateBlogPost,
     deleteBlogPost,
+    search,
 };
