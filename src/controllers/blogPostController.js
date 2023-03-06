@@ -60,4 +60,5 @@ module.exports = {
     getById,
     updateBlogPost,
     deleteBlogPost,
+
 };
