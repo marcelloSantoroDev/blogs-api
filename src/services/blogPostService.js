@@ -18,23 +18,37 @@ const createblogPost = async ({ title, content, categoryIds, id }) => {
     } 
     const transaction = await sequelize.transaction();
     try {
-            const newBlogPost = await BlogPost
+        const newBlogPost = await BlogPost
             .create({ title, content, userId: id }, { transaction });
     
-            const postId = newBlogPost.dataValues.id;
+        const postId = newBlogPost.dataValues.id;
 
-            await Promise.all(categoryIds
-                .map((categoryId) => PostCategory.create({ postId, categoryId }, { transaction })));
+        await Promise.all(categoryIds
+            .map((categoryId) => PostCategory.create({ postId, categoryId }, { transaction })));
 
-            await transaction.commit();
-            return { type: null, message: newBlogPost };
+        await transaction.commit();
+        return { type: null, message: newBlogPost };
     } catch (e) {
-            await transaction.rollback();
-            return { type: 'erro', message: e.message };
+        await transaction.rollback();
+        return { type: 'erro', message: e.message };
         }
+    };
+
+    const getById = async (id) => {
+        const blogPost = await BlogPost.findOne({
+        where: { id },
+        include: [
+            { model: User, as: 'user', attributes: { exclude: 'password' } }, 
+            { model: Category, as: 'categories', attributes: { exclude: 'PostCategory' } }] });
+        if (!blogPost) {
+            return { type: 'POST_NOT_FOUND', message: 'Post does not exist' };
+        }
+
+        return { type: null, message: blogPost };
     };
 
 module.exports = {
     getAll,
     createblogPost,
+    getById,
 };

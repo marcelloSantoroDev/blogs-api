@@ -31,7 +31,6 @@ const allCategoriesExist = async (categoryIds) => {
 const validateBlogPost = async ({ title, content, categoryIds }) => {
     const categoriesHasSomeUndefined = await allCategoriesExist(categoryIds);
     if (categoriesHasSomeUndefined) {
-        console.log(` LOG VALIDATION INPUT >>> ${categoriesHasSomeUndefined}`);
          return { type: 'INVALID_CATEGORIES', message: 'one or more "categoryIds" not found' };
     }
     const bodyList = [title, content];
