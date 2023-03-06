@@ -1,4 +1,4 @@
-const { User, BlogPost, Category, sequelize } = require('../models');
+const { User, BlogPost, Category, PostCategory, sequelize } = require('../models');
 const { validateBlogPost } = require('./validations/validationInputValues');
 
 const getAll = async () => {
@@ -11,21 +11,28 @@ const getAll = async () => {
 };
 
 const createblogPost = async ({ title, content, categoryIds, id }) => {
-    const error = validateBlogPost({ title, content, categoryIds });
-    if (error.type) return error;
-    const result = await sequelize.transaction(async (t) => {
-        const newBlogPost = await BlogPost
-        .create({
-                title,
-                content,
-                userId: id,
-                published: Date.now(),
-                updated: Date.now() }, { transaction: t });
-        return newBlogPost;
-    });
+    const error = await validateBlogPost({ title, content, categoryIds });
+    if (error.type) {
+        console.log(error);
+        return error;
+    } 
+    const transaction = await sequelize.transaction();
+    try {
+            const newBlogPost = await BlogPost
+            .create({ title, content, userId: id }, { transaction });
+    
+            const postId = newBlogPost.dataValues.id;
 
-    return { type: null, message: result };
-};
+            await Promise.all(categoryIds
+                .map((categoryId) => PostCategory.create({ postId, categoryId }, { transaction })));
+
+            await transaction.commit();
+            return { type: null, message: newBlogPost };
+    } catch (e) {
+            await transaction.rollback();
+            return { type: 'erro', message: e.message };
+        }
+    };
 
 module.exports = {
     getAll,

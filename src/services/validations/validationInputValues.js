@@ -1,5 +1,5 @@
 const { emailSchema } = require('./schemas');
-const { User } = require('../../models');
+const { User, Category } = require('../../models');
 
 const validateLoginEmail = (email) => {
     const { error } = emailSchema.validate(email);
@@ -21,14 +21,23 @@ const existingUserCheck = async (email) => {
     return { type: null, message: '' };
 };
 
-const validateBlogPost = ({ title, content, categoryIds }) => {
-    const bodyList = [title, content];
-    const hasUndefined = bodyList.some((item) => item === undefined);
-    if (hasUndefined || !categoryIds) {
-        return { type: 'MISSING_VALUES', message: 'Some required fields are missing' };
-    }
-    if (categoryIds.length !== 2) {
+const allCategoriesExist = async (categoryIds) => {
+    const checkCategory = await Promise
+    .all(categoryIds.map((id) => Category.findOne({ where: { id } })));
+
+    return checkCategory.some((category) => !category);
+};
+
+const validateBlogPost = async ({ title, content, categoryIds }) => {
+    const categoriesHasSomeUndefined = await allCategoriesExist(categoryIds);
+    if (categoriesHasSomeUndefined) {
+        console.log(` LOG VALIDATION INPUT >>> ${categoriesHasSomeUndefined}`);
          return { type: 'INVALID_CATEGORIES', message: 'one or more "categoryIds" not found' };
+    }
+    const bodyList = [title, content];
+    const hasUndefined = bodyList.some((item) => item === undefined || item === '');
+    if (hasUndefined) {
+        return { type: 'MISSING_VALUES', message: 'Some required fields are missing' };
     }
     return { type: null, message: '' };
 };
