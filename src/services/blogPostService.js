@@ -83,8 +83,8 @@ const createblogPost = async ({ title, content, categoryIds, id }) => {
 
     const search = async (q) => {
         if (!q) {
-            const a = await getAll();
-            return { type: null, message: a.message };
+            const allBlogPosts = await getAll();
+            return allBlogPosts;
         }
 
         const blogPostByTitle = await BlogPost
